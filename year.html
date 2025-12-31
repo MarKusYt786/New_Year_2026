@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy New Year</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.mim.js"></script>
+  </head>
+  <body>
+    <div class="surprise" id="surprise">
+      <p class="blink-text">Ur New Year surprise awaits for you 🫴</p>
+      <button class="reveal-btn" id="revealBtn">see now!</button>
+    </div>
+    <style>
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      body > p {
+        margin: 0 0;
+        position: absolute;
+        font: 16px Verdana;
+        color: #eee;
+        height: 25px;
+        top: calc(100vh - 30px);
+        text-shadow: 0 0 2px white;
+      }
+      p a {
+        text-decoration: none;
+        color: #aaa;
+      }
+      span {
+        font-size: 11px;
+      }
+      p > a:first-of-type {
+        font-size: 20px;
+      }
+      body {
+        overflow: hidden;
+      }
+
+      .confetti {
+        position: fixed;
+        top: -12px;
+        width: 7px;
+        height: 14px;
+        border-radius: 2px;
+        opacity: 0.9;
+        pointer-events: none;
+        z-index: 999;
+        animation: confettiFall linear forwards;
+      }
+
+      @keyframes confettiFall {
+        0% {
+          transform: translate3d(0, -10px, 0) rotateZ(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translate3d(var(--x-move), 110vh, 0) rotateZ(400deg);
+          opacity: 0;
+        }
+      }
+
+      .surprise {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 10;
+        transition: opacity 1.8s ease, transform 2.2s ease;
+      }
+
+      .surprise.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        pointer-events: auto;
+      }
+
+      .blink-text {
+        font-size: 26px;
+        color: #fff;
+        margin-bottom: 20px;
+        animation: blink 2.5s infinite;
+        text-shadow: 0 0 10px #ff0, 0 0 20px #f0f;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+
+      .reveal-btn {
+        padding: 14px 30px;
+        font-size: 18px;
+        border: none;
+        border-radius: 30px;
+        background: linear-gradient(135deg, #ff0080, #7928ca);
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(255, 0, 128, 0.6);
+      }
+
+      .reveal-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 25px rgba(255, 0, 200, 1);
+      }
+    </style>
+
+    <canvas id="c"></canvas>
+
+    <script>
+      /* ========= CONFETTI ========= */
+
+      const CONFETTI_COLORS = [
+        "#f97316",
+        "#22d3ee",
+        "#a855f7",
+        "#facc15",
+        "#38bdf8",
+        "#fb7185",
+      ];
+
+      function createConfettiPiece() {
+        const el = document.createElement("div");
+        el.className = "confetti";
+
+        const startLeft = Math.random() * 100; // vw
+        const xMove = (Math.random() * 40 - 20).toFixed(1) + "vw";
+        const color =
+          CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+        const duration = 3 + Math.random() * 2;
+
+        el.style.left = startLeft + "vw";
+        el.style.background = color;
+        el.style.animationDuration = duration + "s";
+        el.style.setProperty("--x-move", xMove);
+
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+          el.remove();
+        }, duration * 1000 + 500);
+      }
+
+      function launchConfetti(bursts = 5, piecesPerBurst = 40) {
+        let count = 0;
+        const interval = setInterval(() => {
+          for (let i = 0; i < piecesPerBurst; i++) {
+            createConfettiPiece();
+          }
+          count++;
+          if (count >= bursts) clearInterval(interval);
+        }, 450);
+      }
+
+      var w = (c.width = window.innerWidth),
+        h = (c.height = window.innerHeight),
+        ctx = c.getContext("2d"),
+        hw = w / 2,
+        hh = h / 2,
+        opts = {
+          strings: ["HAPPY", "NEW YEAR!", "2026"],
+          charSize: 30,
+          charSpacing: 35,
+          lineHeight: 40,
+
+          cx: w / 2,
+          cy: h / 2,
+
+          fireworkPrevPoints: 10,
+          fireworkBaseLineWidth: 5,
+          fireworkAddedLineWidth: 8,
+          fireworkSpawnTime: 200,
+          fireworkBaseReachTime: 30,
+          fireworkAddedReachTime: 30,
+          fireworkCircleBaseSize: 20,
+          fireworkCircleAddedSize: 10,
+          fireworkCircleBaseTime: 30,
+          fireworkCircleAddedTime: 30,
+          fireworkCircleFadeBaseTime: 10,
+          fireworkCircleFadeAddedTime: 5,
+          fireworkBaseShards: 5,
+          fireworkAddedShards: 5,
+          fireworkShardPrevPoints: 3,
+          fireworkShardBaseVel: 4,
+          fireworkShardAddedVel: 2,
+          fireworkShardBaseSize: 3,
+          fireworkShardAddedSize: 3,
+          gravity: 0.1,
+          upFlow: -0.1,
+          letterContemplatingWaitTime: 360,
+          balloonSpawnTime: 20,
+          balloonBaseInflateTime: 10,
+          balloonAddedInflateTime: 10,
+          balloonBaseSize: 20,
+          balloonAddedSize: 20,
+          balloonBaseVel: 0.4,
+          balloonAddedVel: 0.4,
+          balloonBaseRadian: -(Math.PI / 2 - 0.5),
+          balloonAddedRadian: -1,
+        },
+        Tau = Math.PI * 2,
+        TauQuarter = Tau / 4,
+        letters = [];
+
+      ctx.font = opts.charSize + "px Verdana";
+
+      /* ========= HELPER FUNCTIONS (ONCE) ========= */
+
+      function drawChar(letter, x, y, light = 70) {
+        ctx.fillStyle = letter.lightColor.replace("light", light);
+        ctx.fillText(letter.char, x + letter.dx, y + letter.dy);
+      }
+
+      function drawCircle(x, y, r, color) {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Tau);
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+
+      function drawLine(x1, y1, x2, y2, width, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      function drawBalloon(letter, x, y, size, alpha) {
+        ctx.fillStyle = letter.alphaColor.replace("alp", alpha);
+        ctx.beginPath();
+        generateBalloonPath(x, y, size);
+        ctx.fill();
+      }
+
+      /* ========= LETTER ========= */
+
+      function Letter(char, x, y) {
+        this.char = char;
+        this.x = x;
+        this.y = y;
+
+        this.dx = -ctx.measureText(char).width / 2;
+        this.dy = opts.charSize / 2;
+
+        this.fireworkDy = this.y - hh;
+
+        var hue = (x / 500) * 360;
+
+        this.color = "hsl(" + hue + ",80%,50%)";
+        this.lightColor = "hsl(" + hue + ",80%,light%)";
+        this.alphaColor = "hsla(" + hue + ",80%,50%,alp)";
+        this.lightAlphaColor = "hsla(" + hue + ",80%,light%,alp)";
+
+        this.reset();
+      }
+
+      Letter.prototype.reset = function () {
+        this.phase = "firework";
+        this.tick = 0;
+        this.spawned = false;
+        this.spawningTime = (opts.fireworkSpawnTime * Math.random()) | 0;
+        this.reachTime =
+          (opts.fireworkBaseReachTime +
+            opts.fireworkAddedReachTime * Math.random()) |
+          0;
+        this.lineWidth =
+          opts.fireworkBaseLineWidth +
+          opts.fireworkAddedLineWidth * Math.random();
+        this.prevPoints = [[0, hh, 0]];
+      };
+
+      Letter.prototype.step = function () {
+        if (this.phase === "firework") {
+          if (!this.spawned) {
+            if (++this.tick >= this.spawningTime) {
+              this.tick = 0;
+              this.spawned = true;
+            }
+          } else {
+            var linear = this.tick / this.reachTime;
+            var armonic = Math.sin(linear * TauQuarter);
+
+            var x = linear * this.x;
+            var y = hh + armonic * this.fireworkDy;
+
+            this.prevPoints.push([x, y, linear * this.lineWidth]);
+            if (this.prevPoints.length > opts.fireworkPrevPoints)
+              this.prevPoints.shift();
+
+            var lw = 1 / (this.prevPoints.length - 1);
+
+            for (var i = 1; i < this.prevPoints.length; i++) {
+              var p = this.prevPoints[i];
+              var p2 = this.prevPoints[i - 1];
+
+              drawLine(
+                p[0],
+                p[1],
+                p2[0],
+                p2[1],
+                p[2] * lw * i,
+                this.alphaColor.replace("alp", i / this.prevPoints.length)
+              );
+            }
+
+            if (++this.tick >= this.reachTime) {
+              this.phase = "contemplate";
+              this.circleFinalSize =
+                opts.fireworkCircleBaseSize +
+                opts.fireworkCircleAddedSize * Math.random();
+              this.circleCompleteTime =
+                (opts.fireworkCircleBaseTime +
+                  opts.fireworkCircleAddedTime * Math.random()) |
+                0;
+              this.circleFadeTime =
+                (opts.fireworkCircleFadeBaseTime +
+                  opts.fireworkCircleFadeAddedTime * Math.random()) |
+                0;
+              this.circleCreating = true;
+              this.tick = this.tick2 = 0;
+            }
+          }
+        } else if (this.phase === "contemplate") {
+          if (this.circleCreating) {
+            var p = ++this.tick2 / this.circleCompleteTime;
+            var a = -Math.cos(p * Math.PI) / 2 + 0.5;
+
+            drawCircle(
+              this.x,
+              this.y,
+              a * this.circleFinalSize,
+              this.lightAlphaColor
+                .replace("light", 50 + 50 * p)
+                .replace("alp", p)
+            );
+
+            if (this.tick2 >= this.circleCompleteTime) {
+              this.circleCreating = false;
+              this.tick2 = 0;
+            }
+          } else {
+            drawChar(this, this.x, this.y);
+          }
+
+          if (++this.tick > opts.letterContemplatingWaitTime) {
+            this.phase = "balloon";
+            this.tick = 0;
+            this.spawning = true;
+            this.spawnTime = (opts.balloonSpawnTime * Math.random()) | 0;
+            this.inflateTime =
+              (opts.balloonBaseInflateTime +
+                opts.balloonAddedInflateTime * Math.random()) |
+              0;
+            this.size =
+              opts.balloonBaseSize + opts.balloonAddedSize * Math.random();
+            var rad =
+              opts.balloonBaseRadian + opts.balloonAddedRadian * Math.random();
+            var vel =
+              opts.balloonBaseVel + opts.balloonAddedVel * Math.random();
+            this.vx = Math.cos(rad) * vel;
+            this.vy = Math.sin(rad) * vel;
+          }
+        } else if (this.phase === "balloon") {
+          if (this.spawning) {
+            drawChar(this, this.x, this.y);
+            if (++this.tick >= this.spawnTime) {
+              this.spawning = false;
+              this.tick = 0;
+            }
+          } else if (this.tick < this.inflateTime) {
+            var p = ++this.tick / this.inflateTime;
+            drawBalloon(this, this.x, this.y - this.size * p, this.size * p, p);
+            drawLine(
+              this.x,
+              this.y,
+              this.x,
+              this.y - this.size * p,
+              1,
+              this.lightColor.replace("light", 80)
+            );
+            drawChar(this, this.x, this.y);
+          } else {
+            this.x += this.vx;
+            this.y += this.vy += opts.upFlow;
+
+            drawBalloon(this, this.x, this.y, this.size, 1);
+            drawLine(
+              this.x,
+              this.y,
+              this.x,
+              this.y + this.size,
+              1,
+              this.lightColor.replace("light", 80)
+            );
+            drawChar(this, this.x, this.y + this.size);
+
+            // ✅ MARK AS DONE WHEN BALLOON LEAVES SCREEN
+            if (this.y + this.size < -hh || this.x < -hw || this.x > hw) {
+              this.phase = "done";
+            }
+          }
+        }
+      };
+
+      /* ========= BALLOON SHAPE ========= */
+
+      function generateBalloonPath(x, y, size) {
+        ctx.moveTo(x, y);
+        ctx.bezierCurveTo(
+          x - size / 2,
+          y - size / 2,
+          x - size / 4,
+          y - size,
+          x,
+          y - size
+        );
+        ctx.bezierCurveTo(
+          x + size / 4,
+          y - size,
+          x + size / 2,
+          y - size / 2,
+          x,
+          y
+        );
+      }
+
+      /* ========= ANIMATION ========= */
+
+      function anim() {
+        requestAnimationFrame(anim);
+
+        ctx.fillStyle = "#111";
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.translate(hw, hh);
+
+        let done = true;
+        for (let i = 0; i < letters.length; i++) {
+          letters[i].step();
+          if (letters[i].phase !== "done") done = false;
+        }
+
+        ctx.translate(-hw, -hh);
+
+        if (done) {
+          document.getElementById("surprise").classList.add("show");
+        } else {
+          document.getElementById("surprise").classList.remove("show");
+        }
+      }
+
+      /* ========= INIT ========= */
+
+      for (var i = 0; i < opts.strings.length; i++) {
+        for (var j = 0; j < opts.strings[i].length; j++) {
+          letters.push(
+            new Letter(
+              opts.strings[i][j],
+              j * opts.charSpacing - opts.strings[i].length * 15,
+              i * opts.lineHeight - opts.strings.length * 20
+            )
+          );
+        }
+      }
+
+      anim();
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          launchConfetti(6, 45);
+        }, 800);
+      });
+
+      const revealBtn = document.getElementById("revealBtn");
+
+      revealBtn.addEventListener("click", () => {
+      document.body.style.transition = "opacity 0.6s ease";
+      document.body.style.opacity = "0";
+        setTimeout(() => {
+          window.location.href = "wish.html"; // 👈 second file name
+        }, 500);
+      });
+    </script>
+  </body>
+</html>
