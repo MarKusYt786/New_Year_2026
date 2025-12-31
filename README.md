@@ -53,4 +53,3 @@ For any questions or concerns, please contact us at [support@example.com](mailto
 
 ## 💖 Thanks Message
 A huge thanks to everyone who has contributed to this project! 🙏
-This is written by [readme.ai](https://readme-generator-phi.vercel.app/)
