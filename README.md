@@ -49,7 +49,7 @@ Contributions are welcome! If you have any ideas or suggestions, please feel fre
 This project is licensed under the MIT License.
 
 ## 📬 Contact
-For any questions or concerns, please contact us at [support@example.com](mailto:support@example.com).
+For any questions or concerns, please contact us at [yeswanth.cmk@gmail.com](mailto:yeswanth.cmk@gmail.com).
 
 ## 💖 Thanks Message
 A huge thanks to everyone who has contributed to this project! 🙏
